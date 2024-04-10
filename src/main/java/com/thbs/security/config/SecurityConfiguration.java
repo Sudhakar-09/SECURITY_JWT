@@ -13,20 +13,9 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.LogoutHandler;
 
-import static com.thbs.security.user.Permission.ADMIN_CREATE;
-import static com.thbs.security.user.Permission.ADMIN_DELETE;
-import static com.thbs.security.user.Permission.ADMIN_READ;
-import static com.thbs.security.user.Permission.ADMIN_UPDATE;
-import static com.thbs.security.user.Permission.MANAGER_CREATE;
-import static com.thbs.security.user.Permission.MANAGER_DELETE;
-import static com.thbs.security.user.Permission.MANAGER_READ;
-import static com.thbs.security.user.Permission.MANAGER_UPDATE;
-import static com.thbs.security.user.Role.ADMIN;
-import static com.thbs.security.user.Role.MANAGER;
-import static org.springframework.http.HttpMethod.DELETE;
-import static org.springframework.http.HttpMethod.GET;
-import static org.springframework.http.HttpMethod.POST;
-import static org.springframework.http.HttpMethod.PUT;
+import static com.thbs.security.user.Permission.*;
+import static com.thbs.security.user.Role.*;
+import static org.springframework.http.HttpMethod.*;
 import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
 
 @Configuration
@@ -53,27 +42,26 @@ public class SecurityConfiguration {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(AbstractHttpConfigurer::disable)
+                .csrf(AbstractHttpConfigurer::disable) // Disable CSRF protection
                 .authorizeHttpRequests(req ->
-                        req.requestMatchers(WHITE_LIST_URL)
+                        req.requestMatchers(WHITE_LIST_URL) // Permit access to whitelist URLs without authentication
                                 .permitAll()
-                                .requestMatchers("/api/v1/management/**").hasAnyRole(ADMIN.name(), MANAGER.name())
-                                .requestMatchers(GET, "/api/v1/management/**").hasAnyAuthority(ADMIN_READ.name(), MANAGER_READ.name())
-                                .requestMatchers(POST, "/api/v1/management/**").hasAnyAuthority(ADMIN_CREATE.name(), MANAGER_CREATE.name())
-                                .requestMatchers(PUT, "/api/v1/management/**").hasAnyAuthority(ADMIN_UPDATE.name(), MANAGER_UPDATE.name())
-                                .requestMatchers(DELETE, "/api/v1/management/**").hasAnyAuthority(ADMIN_DELETE.name(), MANAGER_DELETE.name())
+                                .requestMatchers("/api/v1/management/**").hasAnyRole(ADMIN.name(), TRAINER.name()) // Allow access to management endpoints for users with ADMIN or TRAINER roles
+                                .requestMatchers(GET, "/api/v1/management/**").hasAnyAuthority(ADMIN_READ.name(), TRAINER_READ.name()) // Restrict GET requests to management endpoints based on specific authorities
+                                .requestMatchers(POST, "/api/v1/management/**").hasAnyAuthority(ADMIN_CREATE.name(), TRAINER_CREATE.name()) // Restrict POST requests to management endpoints based on specific authorities
+                                .requestMatchers(PUT, "/api/v1/management/**").hasAnyAuthority(ADMIN_UPDATE.name(), TRAINER_UPDATE.name()) // Restrict PUT requests to management endpoints based on specific authorities
+                                .requestMatchers(DELETE, "/api/v1/management/**").hasAnyAuthority(ADMIN_DELETE.name(), TRAINER_DELETE.name()) // Restrict DELETE requests to management endpoints based on specific authorities
                                 .anyRequest()
-                                .authenticated()
+                                .authenticated() // Require authentication for any other request
                 )
-                .sessionManagement(session -> session.sessionCreationPolicy(STATELESS))
-                .authenticationProvider(authenticationProvider)
-                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
+                .sessionManagement(session -> session.sessionCreationPolicy(STATELESS)) // Configure session management to be stateless
+                .authenticationProvider(authenticationProvider) // Set custom authentication provider
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class) // Add JWT authentication filter before UsernamePasswordAuthenticationFilter
                 .logout(logout ->
-                        logout.logoutUrl("/api/v1/auth/logout")
-                                .addLogoutHandler(logoutHandler)
-                                .logoutSuccessHandler((request, response, authentication) -> SecurityContextHolder.clearContext())
-                )
-        ;
+                        logout.logoutUrl("/api/v1/auth/logout") // Set logout URL
+                                .addLogoutHandler(logoutHandler) // Add logout handler
+                                .logoutSuccessHandler((request, response, authentication) -> SecurityContextHolder.clearContext()) // Clear security context upon successful logout
+                );
 
         return http.build();
     }

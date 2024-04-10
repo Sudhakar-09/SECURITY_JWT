@@ -1,6 +1,5 @@
 package com.thbs.security.config;
 
-import jakarta.persistence.criteria.CriteriaBuilder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -23,33 +22,38 @@ public class ApplicationConfig {
 
   private final UserRepository repository;
 
+  // Configure a bean for user details service
   @Bean
   public UserDetailsService userDetailsService() {
     return username -> repository.findByEmail(username)
-        .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        .orElseThrow(() -> new UsernameNotFoundException("User not found")); // Load user details from the repository based on username
   }
 
+  // Configure a bean for authentication provider
   @Bean
   public AuthenticationProvider authenticationProvider() {
     DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-    authProvider.setUserDetailsService(userDetailsService());
-    authProvider.setPasswordEncoder(passwordEncoder());
+    authProvider.setUserDetailsService(userDetailsService()); // Set the user details service for authentication provider
+    authProvider.setPasswordEncoder(passwordEncoder()); // Set the password encoder for authentication provider
     return authProvider;
   }
 
+  // Configure a bean for auditor aware
   @Bean
   public AuditorAware<Integer> auditorAware() {
-    return new ApplicationAuditAware();
+    return new ApplicationAuditAware(); // Initialize an instance of auditor aware
   }
 
+  // Configure a bean for authentication manager
   @Bean
   public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
-    return config.getAuthenticationManager();
+    return config.getAuthenticationManager(); // Retrieve the authentication manager from authentication configuration
   }
 
+  // Configure a bean for password encoder
   @Bean
   public PasswordEncoder passwordEncoder() {
-    return new BCryptPasswordEncoder();
+    return new BCryptPasswordEncoder(); // Use BCryptPasswordEncoder for password encoding
   }
 
 }

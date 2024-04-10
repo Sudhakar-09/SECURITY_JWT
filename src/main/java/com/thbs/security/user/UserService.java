@@ -7,29 +7,34 @@ import org.springframework.stereotype.Service;
 
 import java.security.Principal;
 
+// Service class responsible for user-related operations
 @Service
-@RequiredArgsConstructor
+@RequiredArgsConstructor // Lombok annotation to generate a constructor with required arguments
 public class UserService {
 
-    private final PasswordEncoder passwordEncoder;
-    private final UserRepository repository;
+    private final PasswordEncoder passwordEncoder; // Password encoder for encoding passwords
+    private final UserRepository repository; // UserRepository for accessing user data
+
+    // Method for changing user password
     public void changePassword(ChangePasswordRequest request, Principal connectedUser) {
 
+        // Cast Principal to UsernamePasswordAuthenticationToken to access user details
         var user = (User) ((UsernamePasswordAuthenticationToken) connectedUser).getPrincipal();
 
-        // check if the current password is correct
+        // Check if the current password provided matches the user's actual password
         if (!passwordEncoder.matches(request.getCurrentPassword(), user.getPassword())) {
             throw new IllegalStateException("Wrong password");
         }
-        // check if the two new passwords are the same
+
+        // Check if the new password and confirmation password match
         if (!request.getNewPassword().equals(request.getConfirmationPassword())) {
-            throw new IllegalStateException("Password are not the same");
+            throw new IllegalStateException("Passwords do not match");
         }
 
-        // update the password
+        // Encode and set the new password for the user
         user.setPassword(passwordEncoder.encode(request.getNewPassword()));
 
-        // save the new password
+        // Save the updated user entity with the new password
         repository.save(user);
     }
 }
