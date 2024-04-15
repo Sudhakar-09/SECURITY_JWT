@@ -37,4 +37,5 @@ public class UserService {
         // Save the updated user entity with the new password
         repository.save(user);
     }
+    
 }

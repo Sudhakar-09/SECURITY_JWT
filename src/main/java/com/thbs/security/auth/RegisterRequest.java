@@ -1,6 +1,7 @@
 package com.thbs.security.auth;
 
 import com.thbs.security.user.Role; // Importing the Role enum
+import com.thbs.security.user.User;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -18,5 +19,7 @@ public class RegisterRequest {
   private String email; // Represents the email field of the registration request
   private String password; // Represents the password field of the registration request
   private Role role; // Represents the role field of the registration request (using Role enum)
-
+  private Integer employeeId;
+  private String businessUnit;
+ 
 }

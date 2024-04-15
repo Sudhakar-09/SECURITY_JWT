@@ -1,7 +1,5 @@
 package com.thbs.security.auth;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -34,13 +32,7 @@ public class AuthenticationController {
     return ResponseEntity.ok(service.authenticate(request)); // Delegate the authentication request to the AuthenticationService
   }
 
-  // Endpoint for refreshing tokens
-  @PostMapping("/refresh-token")
-  public void refreshToken(
-      HttpServletRequest request,
-      HttpServletResponse response
-  ) throws IOException {
-    service.refreshToken(request, response); // Delegate the token refresh request to the AuthenticationService
-  }
+  
+  
 
 }

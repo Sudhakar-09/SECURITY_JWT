@@ -1,10 +1,6 @@
 package com.thbs.security;
 
-// Importing necessary Spring Boot and application-specific classes
-import static com.thbs.security.user.Role.ADMIN;
-import static com.thbs.security.user.Role.TRAINER;
-
-import org.springframework.boot.CommandLineRunner; // Importing CommandLineRunner interface
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -12,26 +8,21 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
 import com.thbs.security.auth.AuthenticationService;
 import com.thbs.security.auth.RegisterRequest;
+import com.thbs.security.user.Role;
+import com.thbs.security.user.UserRepository;
 
-
-// Enable JPA auditing for entity classes, specifying the bean name for auditor awareness 
-// This annotation tells Spring to enable tracking of who created or modified database records.
-// When you save or update data in the database, Spring will automatically record when it happened and who did it.
 @SpringBootApplication
-
-
 @EnableJpaAuditing(auditorAwareRef = "auditorAware")
 public class SecurityApplication {
 
-    // Main method to run the Spring Boot application
     public static void main(String[] args) {
         SpringApplication.run(SecurityApplication.class, args);
     }
 
-    // Bean definition to execute code at application startup
     @Bean
     public CommandLineRunner commandLineRunner(
-            AuthenticationService service // AuthenticationService bean injected by Spring
+            AuthenticationService service,
+            UserRepository userRepository // Inject UserRepository
     ) {
         return args -> {
             // Register an admin user
@@ -39,22 +30,41 @@ public class SecurityApplication {
                     .firstname("Admin")
                     .lastname("Admin")
                     .email("admin@mail.com")
-                    .password("password")
-                    .role(ADMIN)
+                    .password("password") // Note: Password will be hashed to bcrypt format by the service
+                    .role(Role.ADMIN)
+                    .businessUnit("NBU-TRAINING")
+                    .employeeId(7000)
                     .build();
-            // Display the admin token generated after registration
-            System.out.println("Admin token: " + service.register(admin).getAccessToken());
-
+    
+            // Check if admin user already exists
+            if (userRepository.findByEmail(admin.getEmail()).isEmpty()) {
+                // Save and register admin user
+                System.out.println("Admin token: " + service.register(admin).getAccessToken());
+            } else {
+                System.out.println("Admin user already exists.");
+            }
+    
             // Register a trainer user
             var trainer = RegisterRequest.builder()
                     .firstname("Trainer")
                     .lastname("Trainer")
                     .email("trainer@mail.com")
-                    .password("password")
-                    .role(TRAINER)
+                    .password("password") // Note: Password will be hashed to bcrypt format by the service
+                    .role(Role.TRAINER)
+                    .businessUnit("NBU-TRAINING")
+                    .employeeId(7001)
                     .build();
-            // Display the trainer token generated after registration
-            System.out.println("Trainer token: " + service.register(trainer).getAccessToken());
+    
+            // Check if trainer user already exists
+            if (userRepository.findByEmail(trainer.getEmail()).isEmpty()) {
+                // Save and register trainer user
+                System.out.println("Trainer token: " + service.register(trainer).getAccessToken());
+            } else {
+                System.out.println("Trainer user already exists.");
+            }
         };
     }
-}
+    
+    }
+    
+
