@@ -3,6 +3,8 @@ package com.thbs.security.demo;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -13,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/v1/trainee-management") // This controller handles requests with the base URL "/api/v1/trainee-management"
 @Tag(name = "Trainee Management") // This tag is for grouping related endpoints in Swagger documentation
+@CrossOrigin(origins = {"172.18.4.192", "172.18.5.13"})
 public class ManagementController {
 
     @Operation(

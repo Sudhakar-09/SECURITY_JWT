@@ -13,7 +13,9 @@ import java.util.function.Function;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
-import org.springframework.beans.factory.annotation.Value;
+
+import com.thbs.security.user.User;
+
 import org.springframework.context.annotation.PropertySource;
 
 @Service
@@ -40,9 +42,11 @@ public class JwtService {
     }
 
     // Method to generate JWT token
-    public String generateToken(UserDetails userDetails) {
-        return generateToken(new HashMap<>(), userDetails);
-    }
+    public String generateToken(UserDetails userDetails) {    User user = (User) userDetails; 
+     Map<String, Object> extraClaims = new HashMap<>();    extraClaims.put(
+    "firstName", user.getFirstname());                extraClaims.put(
+    "role", user.getRole().toString());        
+ return generateToken(extraClaims, userDetails);     }
 
     // Method to generate JWT token with extra claims
     public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {

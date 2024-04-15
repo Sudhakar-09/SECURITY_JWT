@@ -9,6 +9,11 @@ import com.thbs.security.user.User;
 import com.thbs.security.user.UserRepository;
 
 import lombok.RequiredArgsConstructor;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -98,6 +103,17 @@ public class AuthenticationService {
             .build();
         tokenRepository.save(token);
     }
+
+        // Scheduled task to delete expired or revoked tokens
+@Scheduled(fixedRate = 3600000) // Run every hour
+public void deleteExpiredOrRevokedTokens() {
+    List<Token> tokensToDelete = tokenRepository.findAll()
+        .stream()
+        .filter(token -> token.isExpired() || token.isRevoked())
+        .collect(Collectors.toList());
+
+    tokenRepository.deleteAll(tokensToDelete);
+}
 
     // Method to revoke all existing user tokens
     private void revokeAllUserTokens(User user) {

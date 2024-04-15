@@ -2,6 +2,7 @@ package com.thbs.security.demo;
 
 import io.swagger.v3.oas.annotations.Hidden;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/v1/admin") // This controller handles requests with the base URL "/api/v1/admin"
 @PreAuthorize("hasRole('ADMIN')") // Restricts access to this controller to users with the role 'ADMIN'
+@CrossOrigin(origins = {"172.18.4.192", "172.18.5.13"})
 public class AdminController {
 
     @GetMapping

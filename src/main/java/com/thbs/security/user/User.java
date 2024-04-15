@@ -25,7 +25,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.thbs.security.token.Token;
 
 // Lombok annotations for automatically generating getters, setters, constructors, and builder pattern methods.
